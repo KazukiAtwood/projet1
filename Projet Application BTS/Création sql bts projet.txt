@@ -1,0 +1,181 @@
+CREATE DATABASE hotel.sql;
+
+CREATE TABLE hotel
+(
+	idH INTEGER(20) PRIMARY KEY,
+	nomH VARCHAR(100),
+	numAdressH VARCHAR(100),
+	voieAdressH VARCHAR(100),
+	cprH VARCHAR(100),
+	villeH VARCHAR(100),
+	descriptionH VARCHAR(4096),
+	horrairesH text
+);
+
+CREATE TABLE photos
+(
+	idP INTEGER(20) PRIMARY KEY,
+	chemin VARCHAR(100),
+	idH INTEGER(20),
+	CONSTRAINT fk_photos_hotel FOREIGN KEY(idH) REFERENCES hotel(idH)
+);
+
+CREATE TABLE client
+(
+	idClient INTEGER(20) PRIMARY KEY,
+	nomClient VARCHAR(100),
+	mailClient VARCHAR(100),
+	mdpClient VARCHAR(100),
+);
+
+CREATE TABLE critiquer
+(
+	idCritique INTEGER(20) PRIMARY KEY,
+	mailClient VARCHAR(100),
+	note INT(5),
+	commentaire VARCHAR(4096),
+    idH INTEGER(20),
+    idClient INTEGER(20),
+	CONSTRAINT fk_critiquer_hotel FOREIGN KEY(idH) REFERENCES hotel(idH),
+	CONSTRAINT fk_critiquer_client FOREIGN KEY(idClient) REFERENCES client(idClient)
+);
+
+
+CREATE TABLE particuliers
+(
+    idClient INTEGER(20) PRIMARY KEY,
+	formule VARCHAR(100),
+	nombre INT(10),
+	CONSTRAINT fk_particuliers_client FOREIGN KEY(idClient) REFERENCES client(idClient)
+);
+
+
+CREATE TABLE professionnels
+(
+    idClient INTEGER(20) PRIMARY KEY,
+	nom_entreprise VARCHAR(100),
+	fonction_employé VARCHAR(100),
+	tarif INT(10),
+	CONSTRAINT fk_professionnels_client FOREIGN KEY(idClient) REFERENCES client(idClient)
+);
+
+
+CREATE TABLE reservation
+(
+     idReservation INTEGER(20) PRIMARY KEY, 
+     idClient INTEGER(20),
+     date_debut VARCHAR(100),
+     duree VARCHAR(100),
+     idH INTEGER(20),
+     idEtage INTEGER(20), 
+     id_relatif INTEGER(20),
+    
+	CONSTRAINT fk_reservation_client FOREIGN KEY(idClient) REFERENCES client(idClient),
+	CONSTRAINT fk_reservation_etage FOREIGN KEY(idEtage) REFERENCES etage(idEtage),
+	CONSTRAINT fk_reservation_chmabres FOREIGN KEY(id_relatif) REFERENCES chambres(id_relatif)
+);
+
+CREATE TABLE equipements
+(
+	idE INTEGER(20) PRIMARY KEY,
+	nomE VARCHAR(100),
+	descriptionE VARCHAR(4096)
+);
+
+
+CREATE TABLE equiper
+(
+    idH INTEGER(20) PRIMARY KEY,
+    idE INTEGER(20),
+	CONSTRAINT fk_equiper_hotel FOREIGN KEY(idH) REFERENCES hotel(idH),
+	CONSTRAINT fk_equiper_equipements FOREIGN KEY(idE) REFERENCES equipements(idE)
+);
+
+CREATE TABLE etage
+(
+	idEtage INTEGER(20),
+      idH INTEGER(20),
+	CONSTRAINT pk_etage PRIMARY KEY(idEtage, idH),
+	CONSTRAINT fk_etage_hotel FOREIGN KEY(idH) REFERENCES hotel(idH)
+);
+
+
+CREATE TABLE chambres
+(
+	id_chambre INTEGER(20),
+	nomChambres VARCHAR(100),
+	tarifChambres INT(10),
+	id_relatif INTEGER(20),
+      idH INTEGER(20),
+      idEtage INTEGER(20),
+	CONSTRAINT pk_chambres PRIMARY KEY(id_chambre, idH, idEtage),
+	CONSTRAINT fk_chambres_hotel FOREIGN KEY(idH) REFERENCES hotel(idH),
+	CONSTRAINT fk_chambres_etage FOREIGN KEY(idEtage) REFERENCES etage(idEtage)
+);
+
+mettre id_relatif en clé étrangère table chambres 
+A FAIRE DES CLASSES DAO, METIERS ET TECHNIQUES et à réviser
+
+ALTER TABLE photos
+ADD CONSTRAINT fk_photos_hotel FOREIGN KEY(idH) REFERENCES hotel(idH);
+
+ALTER TABLE critiquer
+ADD CONSTRAINT fk_critiquer_hotel FOREIGN KEY(idH) REFERENCES hotel(idH),
+ADD CONSTRAINT fk_critiquer_client FOREIGN KEY(idClient) REFERENCES client(idClient);
+
+ALTER TABLE particuliers
+ADD CONSTRAINT fk_particuliers_client FOREIGN KEY(idClient) REFERENCES client(idClient);
+
+ALTER TABLE professionnels 
+ADD CONSTRAINT fk_professionnels_client FOREIGN KEY(idClient) REFERENCES client(idClient);
+
+ALTER TABLE reservation
+ADD CONSTRAINT fk_reservation_client FOREIGN KEY(idClient) REFERENCES client(idClient),
+ADD CONSTRAINT fk_reservation_chambres FOREIGN KEY(id_relatif) REFERENCES chambres(id_relatif);
+
+ALTER TABLE etage
+ADD CONSTRAINT fk_etage_hotel FOREIGN KEY(idH) REFERENCES hotel(idH),
+ADD CONSTRAINT fk_etage_chambres FOREIGN KEY(idEtage) REFERENCES chambres(idEtage)
+
+ALTER TABLE chambres
+ADD CONSTRAINT fk_chambres_hotel FOREIGN KEY(idH) REFERENCES hotel(idH),
+ADD CONSTRAINT fk_chambres_etage FOREIGN KEY(idEtage) REFERENCES etage(idEtage);
+
+ALTER TABLE equiper 	
+ADD CONSTRAINT fk_equiper_hotel FOREIGN KEY(idH) REFERENCES hotel(idH),
+ADD CONSTRAINT fk_equiper_equipements FOREIGN KEY(idE) REFERENCES equipements(idE)
+
+
+INSERT INTO hotel (idH, nomH, numAdressH, voieAdressH, cprH, villeH, descriptionH, horairesH
+VALUES 
+("1", "Le Bordel", "1", "Le boulet", "78888", "Débutant", "Mauvais hotel", '<table>\r\n    <thead>\r\n        <tr>\r\n            <th>Ouverture</th><th>Semaine</th>	<th>Week-end</th>\r\n        </tr>\r\n    </thead>\r\n    <tbody>\r\n        <tr>\r\n            <td class=\"label\">Midi</td>\r\n            <td class=\"cell\">de 11h45 à 14h30</td>\r\n            <td class=\"cell\">de 11h45 à 15h00</td>\r\n        </tr>\r\n        <tr>\r\n            <td class=\"label\">Soir</td>\r\n            <td class=\"cell\">de 18h45 à 22h30</td>\r\n            <td class=\"cell\">de 18h45 à 1h</td>	\r\n        </tr>\r\n        <tr>\r\n            <td class=\"label\">À emporter</td>\r\n            <td class=\"cell\">de 11h30 à 23h</td>\r\n            <td class=\"cell\">de 11h30 à 2h</td>\r\n        </tr>\r\n    </tbody>\r\n</table>'),
+("2", "Vamos clients", "2", "Le rochet", "79999", "Intermédiaire, "Hotel moyen", '<table>\r\n    <thead>\r\n        <tr>\r\n            <th>Ouverture</th><th>Semaine</th>	<th>Week-end</th>\r\n        </tr>\r\n    </thead>\r\n    <tbody>\r\n        <tr>\r\n            <td class=\"label\">Midi</td>\r\n            <td class=\"cell\">de 11h45 à 14h30</td>\r\n            <td class=\"cell\">de 11h45 à 15h00</td>\r\n        </tr>\r\n        <tr>\r\n            <td class=\"label\">Soir</td>\r\n            <td class=\"cell\">de 18h45 à 22h30</td>\r\n            <td class=\"cell\">de 18h45 à 1h</td>	\r\n        </tr>\r\n        <tr>\r\n            <td class=\"label\">À emporter</td>\r\n            <td class=\"cell\">de 11h30 à 23h</td>\r\n            <td class=\"cell\">de 11h30 à 2h</td>\r\n        </tr>\r\n    </tbody>\r\n</table>'),
+("3", "Le luxe", "3", "La mine", "80000", "Avancé", "Hotel de luxe", '<table>\r\n    <thead>\r\n        <tr>\r\n            <th>Ouverture</th><th>Semaine</th>	<th>Week-end</th>\r\n        </tr>\r\n    </thead>\r\n    <tbody>\r\n        <tr>\r\n            <td class=\"label\">Midi</td>\r\n            <td class=\"cell\">de 11h45 à 14h30</td>\r\n            <td class=\"cell\">de 11h45 à 15h00</td>\r\n        </tr>\r\n        <tr>\r\n            <td class=\"label\">Soir</td>\r\n            <td class=\"cell\">de 18h45 à 22h30</td>\r\n            <td class=\"cell\">de 18h45 à 1h</td>	\r\n        </tr>\r\n        <tr>\r\n            <td class=\"label\">À emporter</td>\r\n            <td class=\"cell\">de 11h30 à 23h</td>\r\n            <td class=\"cell\">de 11h30 à 2h</td>\r\n        </tr>\r\n    </tbody>\r\n</table>'),
+; 
+
+
+Le Sapporo propose à ses clients de délicieux plats typiques japonais.
+<table>\r\n    
+    <thead>\r\n        
+        <tr>\r\n            
+            <th>Ouverture</th>
+            <th>Semaine</th>   
+            <th>Week-end</th>\r\n        
+        </tr>\r\n    
+    </thead>\r\n    
+    <tbody>\r\n        
+        <tr>\r\n            
+            <td class=\"label\">Midi</td>\r\n            
+            <td class=\"cell\">de 11h45 à 14h30
+            </td>\r\n            
+            <td class=\"cell\">de 11h45 à 15h00</td>\r\n        
+        </tr>\r\n        
+        <tr>\r\n            
+            <td class=\"label\">Soir</td>\r\n            
+            <td class=\"cell\">de 18h45 à 22h30</td>\r\n            
+            <td class=\"cell\">de 18h45 à 1h</td>   \r\n        
+        </tr>\r\n        <tr>\r\n            
+            <td class=\"label\">À emporter</td>\r\n            
+            <td class=\"cell\">de 11h30 à 23h</td>\r\n            
+            <td class=\"cell\">de 11h30 à 2h</td>\r\n        
+        </tr>\r\n    </tbody>\r\n</table>'),
